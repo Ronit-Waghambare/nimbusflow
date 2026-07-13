@@ -65,7 +65,7 @@ A scheduled safety net that stops and starts tagged EC2 instances automatically,
 
 ## Extent of Application
 
-While initially provisioned manually via the AWS Management Console to establish baseline familiarity with each service's configuration surface, the NimbusFlow architecture is designed as a modular blueprint that translates directly into enterprise, high-scale automation:
+NimbusFlow is designed as a production-ready architectural blueprint. While initially provisioned manually, its decoupled topology serves as a direct foundation for high-scale, production-grade cloud automation:
 
 * **Infrastructure-as-Code (IaC) Readiness:** The decoupled service topology, strict naming conventions, and isolated IAM roles serve as a direct template for declarative deployment tools. The configuration parameters can be mapped seamlessly into Terraform modules, OpenTofu, or AWS Cloud Development Kit (CDK) configurations.
 * **Scale-Independent Economics:** By relying exclusively on serverless billing and trigger models—including AWS Lambda's millisecond execution compute, S3 object notification events, and DynamoDB's on-demand capacity mode—the architecture maintains a true zero-cost baseline when idle. When traffic bursts occur, the platform auto-scales natively to handle thousands of concurrent invocations without structural modifications.
