@@ -24,22 +24,7 @@ No component runs on always-on compute — everything only executes (and only co
 
 ## Architecture
 
-![Architecture Diagram]
 <img width="2692" height="10336" alt="image" src="https://github.com/user-attachments/assets/0e84f108-d06a-4c64-bc3b-91c37b4b594b" />
-
----
-
-## Repository Structure
-
-The platform assets are organized into modular domains, decoupling business logic from underlying access policies and testing frameworks:
-
-* **`src/url_shortener/lambda_function.py`**: Contains the Python application logic for handling API Gateway redirection and short code generation.
-* **`src/image_processor/lambda_function.py`**: Holds the image processing code that handles bucket upload event streams.
-* **`src/cost_automation/lambda_function.py`**: Houses the infrastructure orchestration script invoked by time schedules.
-* **`iam_policies/image_processor_inline_policy.json`**: Explicit policy mapping granular S3 and SNS asset boundaries.
-* **`iam_policies/cost_automation_inline_policy.json`**: The JSON safety architecture policy managing instance runtime state permissions.
-* **`scripts/build_pillow_layer.bat`**: The manual compilation automation sequence designed to assemble binary dependencies.
-* **`scripts/test_endpoints.bat`**: A command utility script managing the execution of localized smoke tests.
 
 ---
 
