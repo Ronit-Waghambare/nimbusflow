@@ -28,7 +28,9 @@ No component runs on always-on compute — everything only executes (and only co
 
 ## Architecture
 
-![Architecture Diagram](./architecture-diagram.svg)
+![Architecture Diagram]
+<img width="2692" height="10336" alt="image" src="https://github.com/user-attachments/assets/0e84f108-d06a-4c64-bc3b-91c37b4b594b" />
+
 
 ---
 
