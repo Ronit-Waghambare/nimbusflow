@@ -65,11 +65,11 @@ A scheduled safety net that stops and starts tagged EC2 instances automatically,
 
 ## Extent of Application
 
-NimbusFlow is designed as a production-ready architectural blueprint. While initially provisioned manually, its decoupled topology serves as a direct foundation for high-scale, production-grade cloud automation:
+While initially provisioned manually via the AWS Management Console to establish baseline familiarity with each service's configuration surface, the NimbusFlow architecture is designed as a modular blueprint that translates directly into enterprise, high-scale automation:
 
-* **Production-Grade Blueprints:** Every component is decoupled to isolate logic boundaries. The architecture transitions seamlessly into Infrastructure-as-Code (IaC) configurations using Terraform, OpenTofu, or AWS CDK.
-* **Zero-Cost Baseline, Infinite Scale:** By relying strictly on serverless utility billing models—DynamoDB on-demand, S3 object triggers, and millisecond-billed Lambda execution—the architecture incurs absolute zero baseline costs when idle, while retaining the capacity to scale immediately to thousands of concurrent transactions without code modifications.
-* **Extensible Event Architecture:** The compute layer functions completely independently of the ingest pipeline. The business logic inside the Lambda handlers can be instantly hot-swapped for alternate engines—such as converting the image processing pipeline into an ancient script OCR parsing utility or upgrading the cost-automation controller to handle managed database instances—without altering the underlying trigger infrastructure.
+* **Infrastructure-as-Code (IaC) Readiness:** The decoupled service topology, strict naming conventions, and isolated IAM roles serve as a direct template for declarative deployment tools. The configuration parameters can be mapped seamlessly into Terraform modules, OpenTofu, or AWS Cloud Development Kit (CDK) configurations.
+* **Scale-Independent Economics:** By relying exclusively on serverless billing and trigger models—including AWS Lambda's millisecond execution compute, S3 object notification events, and DynamoDB's on-demand capacity mode—the architecture maintains a true zero-cost baseline when idle. When traffic bursts occur, the platform auto-scales natively to handle thousands of concurrent invocations without structural modifications.
+* **Pluggable Architecture:** The compute layer is fully decoupled from ingestion, meaning the business logic inside the Lambda handlers functions independently of the entry triggers. Developers can easily swap out or append business logic—such as replacing the Pillow image manipulation code with an optical character recognition (OCR) engine, or extending the EC2 scheduler to manage RDS database clusters—without altering the underlying infrastructure triggers.
 
 ---
 
