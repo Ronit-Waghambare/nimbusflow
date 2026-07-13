@@ -12,8 +12,8 @@ def generate_short_code(length=6):
     return ''.join(random.choice(chars) for _ in range(length))
 
 def lambda_handler(event, context):
-    print(json.dumps(event))  # temporary debug line — still present, not removed
-    http_method = event['requestContext']['http']['method']
+    print(json.dumps(event))  # temporary debug line — still present, not removed[cite: 2]
+    http_method = event['requestContext']['http']['method'][cite: 2]
 
     if http_method == 'POST':
         try:
@@ -51,7 +51,7 @@ def lambda_handler(event, context):
 
     elif http_method == 'GET':
         try:
-            short_code = event.get('pathParameters', {}).get('shortCode')
+            short_code = event.get('pathParameters', {}).get('shortCode')[cite: 2]
 
             if not short_code:
                 return {
@@ -60,7 +60,7 @@ def lambda_handler(event, context):
                     'body': json.dumps({'error': 'Missing shortCode in path'})
                 }
 
-            response = table.get_item(Key={'shortCode': short_code})
+            response = table.get_item(Key={'shortCode': short_code})[cite: 2]
             item = response.get('Item')
 
             if not item:
