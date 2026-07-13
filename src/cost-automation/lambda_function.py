@@ -4,7 +4,7 @@ import boto3
 ec2 = boto3.client('ec2')
 
 TAG_KEY = 'AutoStop'
-TAG_VALUE = 'true'  # lowercase — matches the actual tag value on the instance, see bug #1 below
+TAG_VALUE = 'true' # Verified lowercase match[cite: 2]
 
 def lambda_handler(event, context):
     print(json.dumps(event))
@@ -17,7 +17,6 @@ def lambda_handler(event, context):
             'body': json.dumps({'error': f'Invalid or missing action: {action}'})
         }
     
-        
     response = ec2.describe_instances(
         Filters=[
             {'Name': f'tag:{TAG_KEY}', 'Values': [TAG_VALUE]}
