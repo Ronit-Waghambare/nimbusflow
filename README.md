@@ -10,10 +10,6 @@ Built entirely on AWS Free Tier via the AWS Console, in the `ap-south-1` (Mumbai
 
 Rather than three disconnected demo projects, NimbusFlow is one platform where every component follows the same underlying shape:
 
-```
-Trigger fires → Lambda function reacts → Action happens
-```
-
 Only the trigger source changes across components:
 
 | Component | Trigger | AWS Services |
@@ -31,6 +27,19 @@ No component runs on always-on compute — everything only executes (and only co
 ![Architecture Diagram]
 <img width="2692" height="10336" alt="image" src="https://github.com/user-attachments/assets/0e84f108-d06a-4c64-bc3b-91c37b4b594b" />
 
+---
+
+## Repository Structure
+
+The platform assets are organized into modular domains, decoupling business logic from underlying access policies and testing frameworks:
+
+* **`src/url_shortener/lambda_function.py`**: Contains the Python application logic for handling API Gateway redirection and short code generation.
+* **`src/image_processor/lambda_function.py`**: Holds the image processing code that handles bucket upload event streams.
+* **`src/cost_automation/lambda_function.py`**: Houses the infrastructure orchestration script invoked by time schedules.
+* **`iam_policies/image_processor_inline_policy.json`**: Explicit policy mapping granular S3 and SNS asset boundaries.
+* **`iam_policies/cost_automation_inline_policy.json`**: The JSON safety architecture policy managing instance runtime state permissions.
+* **`scripts/build_pillow_layer.bat`**: The manual compilation automation sequence designed to assemble binary dependencies.
+* **`scripts/test_endpoints.bat`**: A command utility script managing the execution of localized smoke tests.
 
 ---
 
@@ -39,33 +48,47 @@ No component runs on always-on compute — everything only executes (and only co
 ### 1. URL Shortener
 A serverless API that generates short codes for long URLs and redirects on lookup.
 
-- **POST** request → Lambda generates a random short code → stored in DynamoDB
-- **GET** request to the short link → Lambda looks up the code → returns an HTTP redirect
-- DynamoDB used in on-demand capacity mode to stay within Free Tier
-- IAM permissions scoped to exactly `PutItem` / `GetItem` on this table only
+* **POST** request → Lambda generates a random short code → stored in DynamoDB.
+* **GET** request to the short link → Lambda looks up the code → returns an HTTP redirect.
+* DynamoDB used in on-demand capacity mode to stay within Free Tier.
+* IAM permissions scoped to exactly `PutItem` / `GetItem` on the `nimbusflow-urls` table only.
 
 ### 2. Image Processing Pipeline
 An event-driven pipeline that automatically processes images on upload.
 
-- Upload to an S3 "input" bucket triggers a Lambda function
-- Lambda uses a custom-built Pillow layer to resize (max 800×800, aspect-ratio preserved) and watermark the image
-- Processed image is written to a separate "output" S3 bucket
-- A notification is published via SNS on successful processing
-- IAM permissions scoped per-bucket (`GetObject` on input, `PutObject` on output) plus a scoped `sns:Publish`
+* Upload to the `nimbusflow-uploads-01` S3 bucket triggers a Lambda function.
+* Lambda uses a custom-built Pillow layer to resize (max 800×800, aspect-ratio preserved) and watermark the image.
+* Processed image is written to the `nimbusflow-processed-01` S3 bucket.
+* A notification is published via the `nimbusflow-image-notifications` SNS topic on successful processing.
+* IAM permissions scoped per-bucket (`GetObject` on input, `PutObject` on output) plus a scoped `sns:Publish`.
 
 ### 3. Cost Automation
 A scheduled safety net that stops and starts tagged EC2 instances automatically, so test/dev resources don't run (and cost money) unattended.
 
-- Two EventBridge scheduled rules (cron-based) — one triggers a "stop" action, one triggers a "start" action
-- A single Lambda function handles both directions, branching on an `action` input passed by whichever rule fired
-- Instances are targeted by tag (not hardcoded instance IDs), so the automation scales to any instance tagged appropriately
-- IAM policy uses a wildcard resource for EC2 start/stop/describe, since these actions don't support resource-level ARN restriction the way S3/DynamoDB do — a documented, deliberate simplification rather than an oversight
+* Two EventBridge scheduled rules (cron-based) — one triggers a "stop" action, one triggers a "start" action.
+* A single Lambda function handles both directions, branching on an `action` input passed by whichever rule fired.
+* Instances are targeted by tag (`AutoStop` = `true`), so the automation scales to any instance tagged appropriately.
+* IAM policy uses a wildcard resource for EC2 start/stop/describe, since these actions don't support resource-level ARN restriction the same way S3/DynamoDB do — a documented, deliberate simplification rather than an oversight.
+
+---
+
+## Configuration & Verification
+
+To maintain security, environment-specific identifiers are passed contextually or masked during public presentation.
+
+### Sanitized Endpoint Interface Specifications
+* **POST Route (URL Shorten):** `https://<api-id>.execute-api.ap-south-1.amazonaws.com/default/nimbusflow-url-handler`
+* **GET Route (URL Redirection):** `https://<api-id>.execute-api.ap-south-1.amazonaws.com/default/redirect/{shortCode}`
+
+### Cost Automation Cron Schedules
+* **Nightly Instance Shutdown:** Cron `30 17 * * ? *` (Triggers daily at 11:00 PM IST).
+* **Morning Instance Startup:** Cron `30 2 * * ? *` (Triggers daily at 8:00 AM IST).
 
 ---
 
 ## Extent of Application
 
-NimbusFlow is designed as a production-ready architectural blueprint. While initially provisioned manually, its decoupled topology serves as a direct foundation for high-scale, production-grade cloud automation:
+While initially provisioned manually via the AWS Management Console to establish baseline familiarity with each service's configuration surface, the NimbusFlow architecture is designed as a modular blueprint that translates directly into enterprise, high-scale automation:
 
 * **Infrastructure-as-Code (IaC) Readiness:** The decoupled service topology, strict naming conventions, and isolated IAM roles serve as a direct template for declarative deployment tools. The configuration parameters can be mapped seamlessly into Terraform modules, OpenTofu, or AWS Cloud Development Kit (CDK) configurations.
 * **Scale-Independent Economics:** By relying exclusively on serverless billing and trigger models—including AWS Lambda's millisecond execution compute, S3 object notification events, and DynamoDB's on-demand capacity mode—the architecture maintains a true zero-cost baseline when idle. When traffic bursts occur, the platform auto-scales natively to handle thousands of concurrent invocations without structural modifications.
@@ -75,9 +98,9 @@ NimbusFlow is designed as a production-ready architectural blueprint. While init
 
 ## Design Decisions & Trade-offs
 
-- **Console-first, not Terraform** — built manually through the AWS Console to build hands-on familiarity with each service's configuration surface before automating it. A Terraform version is a natural next iteration.
-- **Least-privilege IAM per function** — every Lambda has its own scoped role/policy rather than one shared broad role, except where AWS's IAM model doesn't support finer scoping (documented explicitly where this applies).
-- **Free Tier discipline** — every service choice (Lambda, DynamoDB on-demand, S3, SNS, EventBridge) was picked specifically to stay within AWS's always-free tier rather than the 12-month trial tier, so the platform can run indefinitely without cost risk.
+* **Console-first, not Terraform** — built manually through the AWS Console to build hands-on familiarity with each service's configuration surface before automating it.
+* **Least-privilege IAM per function** — every Lambda has its own scoped role/policy rather than one shared broad role, except where AWS's IAM model doesn't support finer scoping (documented explicitly where this applies).
+* **Free Tier discipline** — every service choice (Lambda, DynamoDB on-demand, S3, SNS, EventBridge) was picked specifically to stay within AWS's always-free tier rather than the 12-month trial tier, so the platform can run indefinitely without cost risk.
 
 ---
 
@@ -103,5 +126,5 @@ Debugging real issues was a significant part of building this — documenting th
 
 ## Notes
 
-- This project runs entirely on AWS Free Tier resources. No component requires paid infrastructure.
-- Sensitive identifiers (API endpoint IDs, ARNs, account IDs) have intentionally been left out of this repository. Environment-specific configuration should be supplied via environment variables or a `.env` file (not committed) if you deploy this yourself.
+* This project runs entirely on AWS Free Tier resources.
+* Sensitive identifiers (API endpoint IDs, ARNs, account IDs) have intentionally been left out of this repository. Environment-specific configuration should be supplied via environment variables or a `.env` file (not committed) if you deploy this yourself.
