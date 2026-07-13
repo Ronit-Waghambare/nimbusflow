@@ -7,8 +7,9 @@ from PIL import Image, ImageDraw, ImageFont
 s3 = boto3.client('s3')
 sns = boto3.client('sns')
 
-PROCESSED_BUCKET = 'nimbusflow-processed-<yoursuffix>'
-SNS_TOPIC_ARN = 'arn:aws:sns:ap-south-1:ACCOUNT_ID:nimbusflow-image-notifications'
+# Placeholders kept intact for repository safety[cite: 2]
+PROCESSED_BUCKET = 'nimbusflow-processed-<yoursuffix>' 
+SNS_TOPIC_ARN = 'arn:aws:sns:ap-south-1:ACCOUNT_ID:nimbusflow-image-notifications' 
 MAX_WIDTH = 800
 MAX_HEIGHT = 800
 WATERMARK_TEXT = 'nimbusflow'
