@@ -67,9 +67,9 @@ A scheduled safety net that stops and starts tagged EC2 instances automatically,
 
 NimbusFlow is designed as a production-ready architectural blueprint. While initially provisioned manually, its decoupled topology serves as a direct foundation for high-scale, production-grade cloud automation:
 
-* **Production-Grade Blueprints:** Every component is decoupled to isolate logic boundaries[cite: 1]. The architecture transitions seamlessly into Infrastructure-as-Code (IaC) configurations using Terraform, OpenTofu, or AWS CDK[cite: 1].
-* **Zero-Cost Baseline, Infinite Scale:** By relying strictly on serverless utility billing models—DynamoDB on-demand[cite: 1], S3 object triggers[cite: 1], and millisecond-billed Lambda execution—the architecture incurs absolute zero baseline costs when idle, while retaining the capacity to scale immediately to thousands of concurrent transactions without code modifications.
-* **Extensible Event Architecture:** The compute layer functions completely independently of the ingest pipeline. The business logic inside the Lambda handlers can be instantly hot-swapped for alternate engines—such as converting the image processing pipeline into an ancient script OCR parsing utility or upgrading the cost-automation controller to handle managed database instances—without altering the underlying trigger infrastructure[cite: 1].
+* **Production-Grade Blueprints:** Every component is decoupled to isolate logic boundaries. The architecture transitions seamlessly into Infrastructure-as-Code (IaC) configurations using Terraform, OpenTofu, or AWS CDK.
+* **Zero-Cost Baseline, Infinite Scale:** By relying strictly on serverless utility billing models—DynamoDB on-demand, S3 object triggers, and millisecond-billed Lambda execution—the architecture incurs absolute zero baseline costs when idle, while retaining the capacity to scale immediately to thousands of concurrent transactions without code modifications.
+* **Extensible Event Architecture:** The compute layer functions completely independently of the ingest pipeline. The business logic inside the Lambda handlers can be instantly hot-swapped for alternate engines—such as converting the image processing pipeline into an ancient script OCR parsing utility or upgrading the cost-automation controller to handle managed database instances—without altering the underlying trigger infrastructure.
 
 ---
 
